@@ -3,6 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "homepage": "https://Paulo-nf.github.io/your-repo-name",
   "scripts": {
     "prestart": "curl -o src/data/class_data.json https://raw.githubusercontent.com/Paolotsname/pf2-stats/main/class_data.json && curl -o src/data/enemy_data.json https://raw.githubusercontent.com/Paolotsname/pf2-stats/main/enemy_data.json",
     "dev": "vite",
