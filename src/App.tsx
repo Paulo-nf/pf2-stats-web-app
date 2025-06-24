@@ -215,18 +215,21 @@ export default function App() {
     let calculator;
     if (showType === "1 player") {
         calculator = (
-            <div className="flex flex-row space-x-4 items-start">
-                <div id="singlePlayer" className="flex flex-row space-x-1 border-2 border-gray-500 p-2 rounded-lg">
-                    <PlayerCard
-                        player={players[0]}
-                        onUpdate={(updatedPlayer) => updatePlayer(0, updatedPlayer)}
-                        onReset={() => resetPlayer(0)}
-                        onRemove={() => removePlayer(0)}
-                    />
+            <div className="flex flex-row space-x-4 items-start w-full">
+                <div className="w-2/5">
+                    <div id="singlePlayer" className="border-2 border-gray-500 p-2 rounded-lg">
+                        <PlayerCard
+                            player={players[0]}
+                            onUpdate={(updatedPlayer) => updatePlayer(0, updatedPlayer)}
+                            onReset={() => resetPlayer(0)}
+                            onRemove={() => removePlayer(0)}
+                        />
+                    </div>
                 </div>
-                <div className="flex flex-col space-y-4">
+
+                <div className="w-2/5 space-y-4">
                     {enemies.map((enemy, index) => (
-                        <div key={index} className="flex border-2 border-gray-500 p-2 rounded-lg">
+                        <div key={index} className="border-2 border-gray-500 p-2 rounded-lg">
                             <RatesCard
                                 player={players[0]}
                                 enemy={enemy}
@@ -234,7 +237,8 @@ export default function App() {
                         </div>
                     ))}
                 </div>
-                <div id="enemyList" className="flex flex-col space-y-4">
+
+                <div id="enemyList" className="w-1/3 space-y-4">
                     {enemies.map((enemy, index) => (
                         <EnemyCard
                             key={index}
@@ -246,7 +250,7 @@ export default function App() {
                             onEnemyUpdate={(updatedEnemy) => updateEnemy(index, updatedEnemy)}
                         />
                     ))}
-                    <button onClick={addEnemy} className="bg-blue-500 text-white px-4 py-2 rounded">
+                    <button onClick={addEnemy} className="bg-blue-500 text-white px-4 py-2 rounded w-full">
                         Add Enemy
                     </button>
                 </div>
@@ -254,10 +258,10 @@ export default function App() {
         );
     } else if (showType === "x players") {
         calculator = (
-            <div className="flex flex-row space-x-4 items-start">
-                <div id="playerList" className="flex flex-col space-y-4">
+            <div className="flex flex-row space-x-4 items-start w-full">
+                <div id="playerList" className="w-2/5 space-y-4">
                     {players.map((player, index) => (
-                        <div key={index} className="flex border-2 border-gray-500 p-2 rounded-lg">
+                        <div key={index} className="border-2 border-gray-500 p-2 rounded-lg">
                             <PlayerCard
                                 player={player}
                                 onUpdate={(updatedPlayer) => updatePlayer(index, updatedPlayer)}
@@ -266,13 +270,14 @@ export default function App() {
                             />
                         </div>
                     ))}
-                    <button onClick={addPlayer} className="bg-blue-500 text-white px-4 py-2 rounded">
+                    <button onClick={addPlayer} className="bg-blue-500 text-white px-4 py-2 rounded w-full">
                         Add Player
                     </button>
                 </div>
-                <div className="flex flex-col space-y-4">
+
+                <div className="w-2/5 space-y-4">
                     {players.map((player, index) => (
-                        <div key={index} className="flex border-2 border-gray-500 p-2 rounded-lg">
+                        <div key={index} className="border-2 border-gray-500 p-2 rounded-lg">
                             <RatesCard
                                 player={player}
                                 enemy={enemies[0]}
@@ -280,7 +285,8 @@ export default function App() {
                         </div>
                     ))}
                 </div>
-                <div className="flex flex-col space-y-4">
+
+                <div className="w-1/3 space-y-4">
                     <EnemyCard
                         enemy={enemies[0]}
                         onRemove={() => handleRemoveEnemy(0)}
