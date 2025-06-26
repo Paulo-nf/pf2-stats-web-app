@@ -82,12 +82,10 @@ const getEnemyStats = (level: number, averageType: string, pwl: boolean): Enemy 
     const typedEnemyData: EnemyAveragesJson = enemyData as EnemyAveragesJson;
 
     try {
-        // Check if the level exists in the data
         if (!typedEnemyData[String(level)]) {
             throw new Error(`No data for level ${level}`);
         }
 
-        // Check if the average type exists for this level
         const levelData = typedEnemyData[String(level)];
         if (!levelData[realAverageType]) {
             throw new Error(`No ${realAverageType} data for level ${level}`);
@@ -111,7 +109,6 @@ const getEnemyStats = (level: number, averageType: string, pwl: boolean): Enemy 
     } catch (error) {
         console.error('Error loading enemy data:', error);
 
-        // Return default enemy stats when data isn't found
         return {
             level: level,
             hp: 0,
@@ -135,6 +132,7 @@ export default function App() {
     const [showType, setShowType] = useState<string>("1 player");
     const [proficiencyWithoutLevel, setProficiencyWithoutLevel] = useState<boolean>(false);
     const [levelDifferences, setLevelDifferences] = useState<number[]>([0]);
+    const [selectedPlayerIndex, setSelectedPlayerIndex] = useState<number>(0);
 
     useEffect(() => {
         setPlayers((players) =>
@@ -147,13 +145,13 @@ export default function App() {
 
     useEffect(() => {
         if (players.length > 0) {
-            const firstPlayerLevel = players[0].playerLevel;
+            const selectedPlayerLevel = players[selectedPlayerIndex].playerLevel;
             const updatedEnemies = enemies.map((_, index) =>
-                getEnemyStats(firstPlayerLevel + (levelDifferences[index] || 0), averageType, proficiencyWithoutLevel)
+                getEnemyStats(selectedPlayerLevel + (levelDifferences[index] || 0), averageType, proficiencyWithoutLevel)
             );
             setEnemies(updatedEnemies);
         }
-    }, [averageType, proficiencyWithoutLevel, players, levelDifferences]);
+    }, [averageType, proficiencyWithoutLevel, players, levelDifferences, selectedPlayerIndex]);
 
     const handleLevelDifferenceChange = (index: number, value: number) => {
         setLevelDifferences((prev) => {
@@ -165,8 +163,8 @@ export default function App() {
 
     const addEnemy = () => {
         if (players.length > 0) {
-            const firstPlayerLevel = players[0].playerLevel;
-            const newEnemy = getInitialEnemy(firstPlayerLevel, averageType, proficiencyWithoutLevel);
+            const selectedPlayerLevel = players[selectedPlayerIndex].playerLevel;
+            const newEnemy = getInitialEnemy(selectedPlayerLevel, averageType, proficiencyWithoutLevel);
             setEnemies((enemies) => [...enemies, newEnemy]);
             setLevelDifferences((prev) => [...prev, 0]);
         }
@@ -202,8 +200,14 @@ export default function App() {
         if (players.length === 1) {
             const newPlayer = { ...initialPlayer, ...calculatePlayerStats(initialPlayer, proficiencyWithoutLevel) };
             setPlayers([newPlayer]);
+            setSelectedPlayerIndex(0);
         } else {
             setPlayers((players) => players.filter((_, i) => i !== index));
+            if (index === selectedPlayerIndex) {
+                setSelectedPlayerIndex(0);
+            } else if (index < selectedPlayerIndex) {
+                setSelectedPlayerIndex(selectedPlayerIndex - 1);
+            }
         }
     };
 
@@ -215,30 +219,53 @@ export default function App() {
     let calculator;
     if (showType === "1 player") {
         calculator = (
-            <div className="flex flex-row space-x-4 items-start w-full">
-                <div className="w-2/5">
+            <div className="flex flex-row space-x-4 items-start">
+                <div className="w-48 space-y-2"> {/* Fixed width of 12rem (48 in Tailwind) */}
+                    <div className="border-2 border-gray-300 p-2 rounded-lg w-full">
+                        <h3 className="font-bold text-center mb-2">Players</h3>
+                        <div className="space-y-2">
+                            {players.map((player, index) => (
+                                <button
+                                    key={index}
+                                    className={`w-full py-1 px-2 rounded ${index === selectedPlayerIndex ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+                                    onClick={() => setSelectedPlayerIndex(index)}
+                                >
+                                    {player.playerClass} {player.playerLevel}
+                                </button>
+                            ))}
+                        </div>
+                        <button
+                            onClick={addPlayer}
+                            className="mt-2 bg-green-500 text-white px-2 py-1 rounded w-full text-sm"
+                        >
+                            Add Player
+                        </button>
+                    </div>
+                </div>
+
+                <div className="w-3/10">
                     <div id="singlePlayer" className="border-2 border-gray-500 p-2 rounded-lg">
                         <PlayerCard
-                            player={players[0]}
-                            onUpdate={(updatedPlayer) => updatePlayer(0, updatedPlayer)}
-                            onReset={() => resetPlayer(0)}
-                            onRemove={() => removePlayer(0)}
+                            player={players[selectedPlayerIndex]}
+                            onUpdate={(updatedPlayer) => updatePlayer(selectedPlayerIndex, updatedPlayer)}
+                            onReset={() => resetPlayer(selectedPlayerIndex)}
+                            onRemove={() => removePlayer(selectedPlayerIndex)}
                         />
                     </div>
                 </div>
 
-                <div className="w-2/5 space-y-4">
+                <div className="w-2/10 space-y-4">
                     {enemies.map((enemy, index) => (
                         <div key={index} className="border-2 border-gray-500 p-2 rounded-lg">
                             <RatesCard
-                                player={players[0]}
+                                player={players[selectedPlayerIndex]}
                                 enemy={enemy}
                             />
                         </div>
                     ))}
                 </div>
 
-                <div id="enemyList" className="w-1/3 space-y-4">
+                <div id="enemyList" className="w-3/10 space-y-4">
                     {enemies.map((enemy, index) => (
                         <EnemyCard
                             key={index}
@@ -253,48 +280,6 @@ export default function App() {
                     <button onClick={addEnemy} className="bg-blue-500 text-white px-4 py-2 rounded w-full">
                         Add Enemy
                     </button>
-                </div>
-            </div>
-        );
-    } else if (showType === "x players") {
-        calculator = (
-            <div className="flex flex-row space-x-4 items-start w-full">
-                <div id="playerList" className="w-2/5 space-y-4">
-                    {players.map((player, index) => (
-                        <div key={index} className="border-2 border-gray-500 p-2 rounded-lg">
-                            <PlayerCard
-                                player={player}
-                                onUpdate={(updatedPlayer) => updatePlayer(index, updatedPlayer)}
-                                onReset={() => resetPlayer(index)}
-                                onRemove={() => removePlayer(index)}
-                            />
-                        </div>
-                    ))}
-                    <button onClick={addPlayer} className="bg-blue-500 text-white px-4 py-2 rounded w-full">
-                        Add Player
-                    </button>
-                </div>
-
-                <div className="w-2/5 space-y-4">
-                    {players.map((player, index) => (
-                        <div key={index} className="border-2 border-gray-500 p-2 rounded-lg">
-                            <RatesCard
-                                player={player}
-                                enemy={enemies[0]}
-                            />
-                        </div>
-                    ))}
-                </div>
-
-                <div className="w-1/3 space-y-4">
-                    <EnemyCard
-                        enemy={enemies[0]}
-                        onRemove={() => handleRemoveEnemy(0)}
-                        isEnabled={true}
-                        levelDifference={levelDifferences[0] || 0}
-                        onLevelDifferenceChange={(value) => handleLevelDifferenceChange(0, value)}
-                        onEnemyUpdate={(updatedEnemy) => updateEnemy(0, updatedEnemy)}
-                    />
                 </div>
             </div>
         );
