@@ -219,9 +219,10 @@ export default function App() {
     let calculator;
     if (showType === "1 player") {
         calculator = (
-            <div className="flex flex-row space-x-4 items-start">
-                <div className="w-48 space-y-2"> {/* Fixed width of 12rem (48 in Tailwind) */}
-                    <div className="border-2 border-gray-300 p-2 rounded-lg w-full">
+            <div className="grid grid-cols-10 gap-4">
+                {/* Players List - col-span-1 */}
+                <div className="col-span-1">
+                    <div className="border-2 border-gray-300 p-2 rounded-lg flex flex-col">
                         <h3 className="font-bold text-center mb-2">Players</h3>
                         <div className="space-y-2">
                             {players.map((player, index) => (
@@ -243,43 +244,58 @@ export default function App() {
                     </div>
                 </div>
 
-                <div className="w-3/10">
-                    <div id="singlePlayer" className="border-2 border-gray-500 p-2 rounded-lg">
-                        <PlayerCard
-                            player={players[selectedPlayerIndex]}
-                            onUpdate={(updatedPlayer) => updatePlayer(selectedPlayerIndex, updatedPlayer)}
-                            onReset={() => resetPlayer(selectedPlayerIndex)}
-                            onRemove={() => removePlayer(selectedPlayerIndex)}
-                        />
+                {/* Player Card - col-span-4 */}
+                <div className="col-span-4">
+                    <div className="border-2 border-gray-500 p-2 rounded-lg">
+                        <div>
+                            <PlayerCard
+                                player={players[selectedPlayerIndex]}
+                                onUpdate={(updatedPlayer) => updatePlayer(selectedPlayerIndex, updatedPlayer)}
+                                onReset={() => resetPlayer(selectedPlayerIndex)}
+                                onRemove={() => removePlayer(selectedPlayerIndex)}
+                            />
+                        </div>
                     </div>
                 </div>
 
-                <div className="w-2/10 space-y-4">
-                    {enemies.map((enemy, index) => (
-                        <div key={index} className="border-2 border-gray-500 p-2 rounded-lg">
-                            <RatesCard
-                                player={players[selectedPlayerIndex]}
-                                enemy={enemy}
-                            />
-                        </div>
-                    ))}
+                {/* Rates Cards - col-span-3 */}
+                <div className="col-span-3">
+                    <div className="overflow-y-auto space-y-4">
+                        {enemies.map((enemy, index) => (
+                            <div key={index} className="border-2 border-gray-500 p-2 rounded-lg min-h-[120px]">
+                                <RatesCard
+                                    player={players[selectedPlayerIndex]}
+                                    enemy={enemy}
+                                />
+                            </div>
+                        ))}
+                    </div>
                 </div>
 
-                <div id="enemyList" className="w-3/10 space-y-4">
-                    {enemies.map((enemy, index) => (
-                        <EnemyCard
-                            key={index}
-                            enemy={enemy}
-                            onRemove={() => handleRemoveEnemy(index)}
-                            isEnabled={true}
-                            levelDifference={levelDifferences[index] || 0}
-                            onLevelDifferenceChange={(value) => handleLevelDifferenceChange(index, value)}
-                            onEnemyUpdate={(updatedEnemy) => updateEnemy(index, updatedEnemy)}
-                        />
-                    ))}
-                    <button onClick={addEnemy} className="bg-blue-500 text-white px-4 py-2 rounded w-full">
-                        Add Enemy
-                    </button>
+                {/* Enemy List - col-span-2 */}
+                <div className="col-span-2">
+                    <div className="flex flex-col">
+                        <div className="flex-1 space-y-4">
+                            {enemies.map((enemy, index) => (
+                                <div key={index}>
+                                    <EnemyCard
+                                        enemy={enemy}
+                                        onRemove={() => handleRemoveEnemy(index)}
+                                        isEnabled={true}
+                                        levelDifference={levelDifferences[index] || 0}
+                                        onLevelDifferenceChange={(value) => handleLevelDifferenceChange(index, value)}
+                                        onEnemyUpdate={(updatedEnemy) => updateEnemy(index, updatedEnemy)}
+                                    />
+                                </div>
+                            ))}
+                        </div>
+                        <button
+                            onClick={addEnemy}
+                            className="bg-blue-500 text-white px-4 py-2 rounded w-full mt-4 flex-shrink-0"
+                        >
+                            Add Enemy
+                        </button>
+                    </div>
                 </div>
             </div>
         );

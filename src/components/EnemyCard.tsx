@@ -76,7 +76,7 @@ const EnemyCard = ({
                 </button>
 
                 <label className="block mb-4">
-                    <strong>CR</strong>:
+                    <strong>CR Difference</strong>:
                     <input
                         type="number"
                         value={levelDifference}
