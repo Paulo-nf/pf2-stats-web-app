@@ -7,6 +7,7 @@ export interface Player {
     intelligence: number;
     wisdom: number;
     charisma: number;
+    spellcastingAttr: string;
     itemBonusWeapon: number;
     itemArmor: number;
     itemBonusArmor: number;

@@ -19,6 +19,7 @@ const initialPlayer: Player = {
     intelligence: 0,
     wisdom: 0,
     charisma: 0,
+    spellcastingAttr: "charisma",
     itemBonusWeapon: 0,
     itemArmor: 0,
     itemBonusArmor: 0,
@@ -38,7 +39,7 @@ const getInitialEnemy = (playerLevel: number, averageType: string, pwl: boolean)
 };
 
 const calculatePlayerStats = (player: Player, pwl: boolean): PlayerStats => {
-    const { playerClass, playerLevel, strength, dexterity, constitution, wisdom, charisma, itemBonusWeapon, itemArmor, itemBonusArmor, itemBonusSaves, itemDexCap } = player;
+    const { playerClass, playerLevel, strength, dexterity, constitution, intelligence, wisdom, charisma, spellcastingAttr, itemBonusWeapon, itemArmor, itemBonusArmor, itemBonusSaves, itemDexCap } = player;
     const key = playerClass;
     const proficiencies = classData[key as keyof typeof classData]["proficiencies"][playerLevel - 1];
     enum ProficiencyEnum {
@@ -59,11 +60,14 @@ const calculatePlayerStats = (player: Player, pwl: boolean): PlayerStats => {
         return 0;
     };
 
+    const castingDict = { intelligence, wisdom, charisma };
+    const spellcastingMod: number = castingDict[spellcastingAttr as keyof typeof castingDict];
+
     return {
         weaponStrike0: proficiencies[ProficiencyEnum.WEAPON_ROLL] + strength + itemBonusWeapon + levelBonus,
         weaponStrike1: proficiencies[ProficiencyEnum.WEAPON_ROLL] + strength + itemBonusWeapon - 5 + levelBonus,
         weaponStrike2: proficiencies[ProficiencyEnum.WEAPON_ROLL] + strength + itemBonusWeapon - 10 + levelBonus,
-        spellAttack: proficiencies[ProficiencyEnum.SPELL] ? proficiencies[1] + charisma + levelBonus : 0,
+        spellAttack: proficiencies[ProficiencyEnum.SPELL] ? proficiencies[1] + spellcastingMod + levelBonus : 0,
         armorClass: proficiencies[ProficiencyEnum.AC] + 10 + Math.min(dexterity, itemDexCap) + itemArmor + itemBonusArmor + levelBonus,
         fortitude: proficiencies[ProficiencyEnum.FORTITUDE] + constitution + itemBonusSaves + levelBonus,
         reflex: proficiencies[ProficiencyEnum.REFLEX] + dexterity + itemBonusSaves + levelBonus,

@@ -31,6 +31,7 @@ const PlayerCard = ({ player, onUpdate, onReset, onRemove }: PlayerCardProps) =>
         fortitude,
         reflex,
         will,
+        spellcastingAttr,
         hasAdvantage,
         hasDisadvantage,
     } = player;
@@ -123,6 +124,21 @@ const PlayerCard = ({ player, onUpdate, onReset, onRemove }: PlayerCardProps) =>
         </>
     );
 
+    const renderSpellcastingAttrInput = () => (
+        <label className="block mb-4">
+        <strong>Spellcasting Modifier</strong>:
+        <select
+        value={spellcastingAttr}
+        onChange={(e) => handleInputChange("spellcastingAttr", e.target.value)}
+        className="ml-2 p-1 border rounded"
+        >
+        <option value="intelligence">Intelligence</option>
+        <option value="wisdom">Wisdom</option>
+        <option value="charisma">Charisma</option>
+        </select>
+        </label>
+    );
+
     return (
         <div className="flex flex-col md:flex-row bg-white rounded-lg p-6 space-y-4 md:space-y-0 md:space-x-6">
             <div className="flex flex-col space-y-2">
@@ -153,6 +169,7 @@ const PlayerCard = ({ player, onUpdate, onReset, onRemove }: PlayerCardProps) =>
                 {renderItemInput("Item Bonus (Armor)", "itemBonusArmor", itemBonusArmor)}
                 {renderItemInput("Item Bonus (Saves)", "itemBonusSaves", itemBonusSaves)}
                 {renderItemInput("Dex Cap", "itemDexCap", itemDexCap)}
+                {renderSpellcastingAttrInput()}
                 {renderVantageInput()}
             </div>
             <div className="flex-1">
